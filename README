@@ -1,0 +1,22 @@
+This is a mirror of http://www.vim.org/scripts/script.php?script_id=2147
+
+[NOTE: The most recent version requires the Align.vim (vimscript #294) plugin if you want to use the summary ticket view. (The default and most readable view)
+http://www.ascetinteractive.com.au/vimtrac/attachment/wiki/Screenshots/summary.jpg]
+
+
+This is a client for the open source trac source code manager and ticketing system. (http://trac.edgewall.org/) It will enable you to 
+
+- do browsing and editing  of a trac sites wiki pages
+- create and edit tickets 
+- add attachments 
+- view project timelines changesets as unified diffs.
+- perform trac site searches
+- browser previews and text dumps of wikis.
+
+
+VimTrac's wiki is here http://www.ascetinteractive.com.au/vimtrac 
+The Repo is now on github here http://github.com/mjbrownie/Trac.vim
+
+If you have any issues/requests create a ticket there using the login details in the trac.vim script or email me.
+
+
