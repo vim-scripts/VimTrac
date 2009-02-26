@@ -28,13 +28,18 @@
 "   Maintainer: Michael Brown <michael <at> ascetinteractive.com>
 "  Last Change:
 "          URL:
-"      Version: 0.3.3
+"      Version: 0.3.4
 "
 "        Usage:
 "
 "               You must have a working Trac repository version 0.10 or later
 "               complete with the xmlrpc plugin and a user with suitable
 "               access rights.
+"
+"               To use the summary view you need to have the Align plugin
+"               installed for the layout.
+"
+"               http://www.vim.org/scripts/script.php?script_id=294
 "
 "               Fill in the server login details in the config section below.
 "
@@ -109,9 +114,39 @@
 "               - Improve Ticket Viewing option
 "               - Add support for multiple trac servers
 "
-"
+"}}}
 "Configuration
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Load trac.py either from the runtime directory (usually
+" /usr/local/share/vim/vim71/plugin/ if you're running Vim 7.1) or from the
+" home vim directory (usually ~/.vim/plugin/).
+"
+if g:tracServerList == {}
+    finish
+endif
+
+if !has("python")
+    call confirm('Trac.vim needs vim python 2.4.4 support. Wont load', 'OK')
+    finish
+endif
+
+if filereadable($VIMRUNTIME."/plugin/trac.py")
+  pyfile $VIMRUNTIME/plugin/trac.py
+elseif filereadable($HOME."/.vim/plugin/trac.py")
+  pyfile $HOME/.vim/plugin/trac.py
+else
+  call confirm('trac.vim: Unable to find trac.py. Place it in either your home vim directory or in the Vim runtime directory.', 'OK')
+  finish
+endif
+
+python import sys
+python if sys.version_info[:3] < (2,4,4):vim.command('let g:tracPythonVersionFlag = 1')
+
+if exists('g:tracPythonVersionFlag')
+    call confirm  ( "Trac.vim requires python 2.4.4 or later to work correctly" )
+    finish
+endif
 
 if !exists('g:tracDefaultComment')
 let g:tracDefaultComment = 'VimTrac update' " DEFAULT COMMENT CHANGE
@@ -193,26 +228,7 @@ endif
 
 "
 "
-" Load trac.py either from the runtime directory (usually
-" /usr/local/share/vim/vim71/plugin/ if you're running Vim 7.1) or from the
-" home vim directory (usually ~/.vim/plugin/).
-"
-if g:tracServerList == {}
-    finish
-endif
 
-if filereadable($VIMRUNTIME."/plugin/trac.py")
-  pyfile $VIMRUNTIME/plugin/trac.py
-elseif filereadable($HOME."/.vim/plugin/trac.py")
-  pyfile $HOME/.vim/plugin/trac.py
-else
-  call confirm('trac.vim: Unable to find trac.py. Place it in either your home vim directory or in the Vim runtime directory.', 'OK')
-  finish
-endif
-
-if !has("python")
-    finish
-endif
 
 "Commmand Declarations
 "
@@ -465,6 +481,30 @@ endfun
 
 fun ComSort (A,L,P)
     return filter (['priority','milestone'], 'v:val =~ "^' . a:A . '"')
+endfun
+
+
+"Callback Function for Minibufexplorer et al windows that dont like being
+"closed by the :only command
+"TODO add other common plugins that may be affected 
+"see OpenCloseCallbacks in the wiki
+fun TracOpenViewCallback()
+    try
+        CMiniBufExplorer
+    catch
+        return 0
+    endt
+
+    return 1
+endfun
+
+fun TracCloseViewCallback()
+    try
+        MiniBufExplorer
+    catch
+        return 0
+    endt
+    return 1
 endfun
 
 python trac_init()
